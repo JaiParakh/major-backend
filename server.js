@@ -28,7 +28,7 @@ app.post('/getresult', (req, res) => {
             console.log(err);
             return res.json({success: false});
         }
-        let process = spawn('python', ["./filename.py", "./public/file.jpg"]);
+        let process = spawn('python', ["./main.py", "./public/file.jpg"]);
         process.stdout.on('data', (data) => {
             console.log('From Js ' + JSON.parse(data.toString()))
             return res.json({success: true, data: data})
