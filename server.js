@@ -13,30 +13,37 @@ var storage = multer.diskStorage(
         cb(null, 'public')
     },
     filename: function (req, file, cb) {
-        console.log(file);
+        console.log(file.originalname);
         let ext = file.originalname.substr(file.originalname.indexOf('.'));
-        cb(null, file.fieldname + ext )
+        cb(null, file.fieldname+ext)
     }
 });
+
+// 0: Covid +
+// 1: Covid -
 
 var upload = multer({ storage: storage }).single('file')
 
 app.post('/getresult', (req, res) => {
-    console.log(req.body);
+    //console.log(req.body);
     upload(req, res, function (err) {
         if(err){
             console.log(err);
             return res.json({success: false});
         }
-        let process = spawn('python', ["./main.py", "./public/file.jpg"]);
-        process.stdout.on('data', (data) => {
-            console.log('From Js ' + JSON.parse(data.toString()))
-            return res.json({success: true, data: data})
+        //return res.json({success: true, covid: "Negative"});
+        //console.log(file)
+        let process = spawn('python', ["./main.py", "./public/file.jpeg"]);
+
+        process.stdout.on('data', function(data){
+            let covid = "Negative";
+            if(data == 0){
+                covid = "Positive";
+            }
+            return res.json({ success: true, covid});
+            //console.log("In Js " + data.toString())
+            //console.log('From Js ' + JSON.parse(data.toString()).data);
         });
-        process.stdout.on('error', (err) => {
-            console.log(err);
-            return res.json({success: false});
-        })
     });
 });
 
